@@ -1,144 +1,146 @@
 from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
-class Stack():
+import time
+
+class Stack:
     def __init__(self):
-        self.stack=[]
-        self.limit=5
-        self.top=0
-        
+        self.stack = []
+        self.limit = 5
+
     def isempty(self):
         return len(self.stack) == 0
+
     def isfull(self):
-        return len(self.stack)== self.limit
-    
-    def push(self,ele):
+        return len(self.stack) == self.limit
+
+    def push(self, ele):
         if self.isfull():
-            messagebox.showwarning("Warning","Stack Overflow")
-        else:
-            self.stack.append(ele)
-            self.top+=1
+            return "Overflow"
+        self.stack.append(ele)
+        return True
 
     def pop(self):
         if self.isempty():
-            messagebox.showwarning("Warning","Stack Underflow")
-
-        else:
-            self.stack.pop()
-            self.top-=1
+            return "Underflow"
+        return self.stack.pop()
 
     def peek(self):
         if self.isempty():
-            messagebox.showwarning("Warning","Stack Underflow")
-        else:
-            return self.stack[-1]
-            
+            return "Underflow"
+        return self.stack[-1]
+
     def display(self):
-         for i in self.stack:
-             print(i,end=" ")
-
-             
-class Application(Frame):
-
-    def __init__(self,master,obj):
-     super().__init__(master)
-     self.obj=obj
-     self.pack()
-     
-     self.CreateWidget()
-
-    def CreateWidget(self):
-       Label(self,text="Working of Stack",font=("Times",20,"bold")).pack()
-     
-       self.topframe=Frame(self,bg="Light Green",height=150,width=500)
-       self.topframe.pack(side=TOP,fill=BOTH,expand=1)
-
-       self.bottomframe=Frame(self,height=350,width=500)
-       self.bottomframe.pack(side=BOTTOM,fill=BOTH,expand=1)
-
-       ttk.Separator(root,orient=HORIZONTAL).pack()
-       
-       self.create=Button(self.topframe,text="Create Stack",command=self.createstack)
-       self.create.grid(row=0,column=2,columnspan=5,sticky=NW)
-       self.push=Label(self.topframe,text="Push")
-       self.push.grid(row=1,column=1,sticky=NE,pady=3)
-       self.entry1=Entry(self.topframe,width=8)
-       self.entry1.grid(row=1,column=2)
-       self.accept=Button(self.topframe,text="accept",command=self.pushvalue)
-       self.accept.grid(row=1,column=3,pady=3)
-
-       self.pop=Button(self.topframe,text="Pop",command=self.popvalue)
-       self.pop.grid(row=2,column=0)
-
-       self.peek=Button(self.topframe,text="Peek",command=self.peekvalue)
-       self.peek.grid(row=2,column=2)
-       
-       self.display=Button(self.topframe,text="Display",command=self.obj.display)
-       self.display.grid(row=2,column=5)
-
-       self.c=Canvas(self.bottomframe,height=350,width=400,bg="pink")
-       self.c.pack()
+        if self.isempty():
+            return []
+        return self.stack[::-1]  # top-first
 
 
-    def createstack(self):
-        
-        self.c.create_line(100,50,100,300)
-        self.c.create_line(100,300,250,300)
-        self.c.create_line(250,300,250,50)
-        self.create.config(text="Delete Stack",command=self.deletestack)
-        self.x1,self.y1,self.x2,self.y2 = 100,250,250,300
-        self.rect=[None for i in range(5)]         #5 boxes inside the stack
-        self.text=[None for i in range(5)]    
-        self.irect=-1
-        self.trect=-1
-        self.color=["light green","green","yellow","orange","red"]
-        self.c_index=0
+class StackApp(Frame):
+    def __init__(self, master, obj):
+        super().__init__(master)
+        self.obj = obj
+        self.colors = ["lightblue", "lightgreen", "orange", "yellow", "pink"]
+        self.color_index = 0
+        self.pack(fill=BOTH, expand=True)
+        self.create_widgets()
 
-    def deletestack(self):
-        self.c.delete("all")
-        self.create.config(text="Create Stack",command=self.createstack)
-        
+    def create_widgets(self):
+        Label(self, text="Stack", font=("Times", 20, "bold")).pack(pady=10)
 
-    def pushvalue(self):
-        val=self.entry1.get()
-        if val== "":
+        topframe = Frame(self)
+        topframe.pack(side=TOP, pady=5)
+
+        Label(topframe, text="Push Value:").grid(row=0, column=0, padx=5)
+        self.entry = Entry(topframe, width=10)
+        self.entry.grid(row=0, column=1, padx=5)
+        Button(topframe, text="Push", command=self.push_value, bg="green", fg="white").grid(row=0, column=2, padx=5)
+
+        Button(topframe, text="Pop", command=self.pop_value, bg="orange", fg="white").grid(row=1, column=0, padx=5)
+        Button(topframe, text="Peek", command=self.peek_value, bg="blue", fg="white").grid(row=1, column=1, padx=5)
+        Button(topframe, text="Display", command=self.display_stack, bg="purple", fg="white").grid(row=1, column=2, padx=5)
+
+        self.canvas = Canvas(self, width=300, height=350, bg="white")
+        self.canvas.pack(pady=10)
+
+    def show_message(self, message):
+        self.canvas.delete("msg")
+        self.canvas.create_text(150, 20, text=message, font=("Arial", 12), fill="red", tags="msg")
+
+    def push_value(self):
+        val = self.entry.get()
+        if not val:
             return
-        elif not self.obj.isfull():
-            self.obj.push(val)
-            self.irect+=1
-            self.trect+=1
-            self.rect[self.irect] =self.c.create_rectangle(self.x1,self.y1,self.x2,self.y2,fill=self.color[self.c_index])
-            self.text[self.trect]=self.c.create_text(self.x1+60,self.y1+20,text=val,justify=CENTER,font=("Times",20,'bold'))
-            self.x1,self.y1,self.x2,self.y2 = self.x1,self.y1-50,self.x2,self.y2-50
-            if self.c_index == len(self.color)-1 :
-              self.c_index=0
-            else:
-              self.c_index+=1
+        result = self.obj.push(val)
+        if result == "Overflow":
+            self.show_message("Stack Overflow")
         else:
-            messagebox.showwarning("Warning","Stack OverFlow")
+            self.entry.delete(0, END)
+            self.show_message("") 
+            self.animate_push(val)
 
-        
-        self.entry1.delete(0,END)
+    def pop_value(self):
+        result = self.obj.pop()
+        if result == "Underflow":
+            self.show_message("Stack Underflow")
+        else:
+            self.show_message(f"Popped: {result}")
+            self.animate_pop()
 
-    
-    def popvalue(self):
-        self.obj.pop()
-        self.c.delete(self.rect[self.irect])
-        self.c.delete(self.text[self.trect])
-        self.x1,self.y1,self.x2,self.y2 = self.x1,self.y1+50,self.x2,self.y2+50
-        self.irect-=1
-        self.trect-=1
+    def peek_value(self):
+        result = self.obj.peek()
+        if result == "Underflow":
+            self.show_message("Stack is Empty")
+        else:
+            self.show_message(f"Top: {result}")
 
-    def peekvalue(self):
-    
-        self.c.itemconfig(self.rect[self.irect],fill="GOLD")   #use  canvas.itemconfig(canvasobject,options)
-        print(self.obj.peek())
-        
-           
-              
-root=Tk()
-root.title("Data Structure")
-root.geometry("500x500")
-s=Stack()
-App=Application(root,s)
-root.mainloop()
+    def display_stack(self):
+        stack_items = self.obj.display()
+        if not stack_items:
+            self.show_message("Stack is Empty")
+        else:
+            self.show_message(f"Stack: {', '.join(map(str, stack_items))}")
+        self.draw_stack()
+
+    def draw_stack(self):
+        self.canvas.delete("block")
+        stack_items = self.obj.display()
+        x1, y1 = 100, 300
+        x2, y2 = 200, 350
+        for i, item in enumerate(stack_items):
+            color = self.colors[i % len(self.colors)]
+            self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, tags="block")
+            self.canvas.create_text((x1+x2)//2, (y1+y2)//2, text=str(item), tags="block")
+            y1 -= 50
+            y2 -= 50
+
+    def animate_push(self, val):
+        y_start = 0
+        y_end = 300 - (len(self.obj.stack)-1) * 50
+        rect = self.canvas.create_rectangle(100, y_start, 200, y_start+50, fill=self.colors[self.color_index], tags="block")
+        text = self.canvas.create_text(150, y_start+25, text=val, tags="block")
+        while y_start < y_end:
+            self.canvas.move(rect, 0, 5)
+            self.canvas.move(text, 0, 5)
+            self.canvas.update()
+            time.sleep(0.01)
+            y_start += 5
+        self.color_index = (self.color_index+1) % len(self.colors)
+        self.draw_stack()
+
+    def animate_pop(self):
+        items = self.canvas.find_withtag("block")
+        if items:
+            rect = items[-2]
+            text = items[-1]
+            for _ in range(20):
+                self.canvas.move(rect, 0, -5)
+                self.canvas.move(text, 0, -5)
+                self.canvas.update()
+                time.sleep(0.01)
+            self.draw_stack()
+
+
+def open_window():
+    win = Toplevel()
+    win.title("Stack")
+    win.geometry("400x400")
+    StackApp(win, Stack())
