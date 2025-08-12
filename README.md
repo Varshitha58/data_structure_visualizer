@@ -37,3 +37,7 @@ Includes both **array-based** and **linked list-based** implementations — all 
 1. Clone the repository:
    ```bash
    git clone https://github.com/Varshitha58/data_structure_visualizer.git
+
+2. Run the main program:
+    ```bash
+    python main.py
